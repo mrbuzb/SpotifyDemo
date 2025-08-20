@@ -19,17 +19,17 @@ public class TrackRepository(AppDbContext _context) : ITrackRepository
     public async Task<ICollection<Track>> GetTracksByGenresAsync(IEnumerable<string> genres)
     {
         return await _context.Tracks
-            .Where(t => genres.Contains(t.Genre))
+            .Include(t => t.UploadedBy).Where(t => genres.Contains(t.Genre))
             .ToListAsync();
     }
     public async Task<ICollection<Track>> GetAllAsync()
-        => await _context.Tracks.ToListAsync();
+        => await _context.Tracks.Include(t => t.UploadedBy).ToListAsync();
 
     public async Task<ICollection<Track>> GetByUserIdAsync(long userId)
-        => await _context.Tracks.Where(t => t.UploadedById == userId).ToListAsync();
+        => await _context.Tracks.Include(t => t.UploadedBy).Where(t => t.UploadedById == userId).ToListAsync();
 
     public async Task<ICollection<Track>> GetByGenreAsync(string genre)
-        => await _context.Tracks.Where(t => t.Genre == genre).ToListAsync();
+        => await _context.Tracks.Include(t => t.UploadedBy).Where(t => t.Genre == genre).ToListAsync();
 
     public async Task<long> AddAsync(Track track)
     {

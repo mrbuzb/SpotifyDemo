@@ -19,9 +19,9 @@ public class PlaylistTrackService : IPlaylistTrackService
         await _playlistTrackRepository.AddTrackToPlaylistAsync(playlistId, trackId);
     }
 
-    public async Task RemoveTrackFromPlaylistAsync(long playlistId, long trackId)
+    public async Task RemoveTrackFromPlaylistAsync(long playlistId, long trackId, long userId)
     {
-        await _playlistTrackRepository.RemoveTrackFromPlaylistAsync(playlistId, trackId);
+        await _playlistTrackRepository.RemoveTrackFromPlaylistAsync(playlistId, trackId,userId);
     }
 
     public async Task<IEnumerable<TrackDto>> GetTracksByPlaylistIdAsync(long playlistId)

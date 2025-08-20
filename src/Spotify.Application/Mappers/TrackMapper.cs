@@ -17,7 +17,8 @@ public static class TrackMapper
             ArtistName = track.ArtistName,
             ReleaseDate = track.ReleaseDate,
             AlbumName = track.AlbumName,
-            UploadedById = track.UploadedById
+            UploadedById = track.UploadedById,
+            Creator = track.UploadedBy is null ? "Nomalum" : track.UploadedBy.UserName,
         };
     }
 

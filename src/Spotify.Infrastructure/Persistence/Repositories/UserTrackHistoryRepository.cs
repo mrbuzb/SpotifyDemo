@@ -35,7 +35,6 @@ public class UserTrackHistoryRepository(AppDbContext _context) : IUserTrackHisto
     {
         return await _context.UserTrackHistorys
             .Include(h => h.Track)
-            .ThenInclude(t => t.Genre)
             .Where(h => h.UserId == userId)
             .OrderByDescending(h => h.PlayedAt)
             .ToListAsync();

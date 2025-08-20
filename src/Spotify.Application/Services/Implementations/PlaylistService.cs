@@ -1,6 +1,8 @@
 ﻿using Spotify.Application.Dtos;
 using Spotify.Application.Interfaces;
 using Spotify.Application.Mappers;
+using Spotify.Application.Services.Interfaces;
+using Spotify.Core.Errors;
 using Spotify.Domain.Entities;
 
 namespace Spotify.Application.Services.Implementations;
@@ -46,12 +48,12 @@ public class PlaylistService : IPlaylistService
         }).ToList();
     }
 
-    public async Task<long> CreateAsync(PlaylistCreateDto dto)
+    public async Task<long> AddAsync(PlaylistCreateDto dto, long userId)
     {
         var playlist = new Playlist
         {
             Name = dto.Name,
-            UserId = dto.UserId,
+            UserId = userId,
             Tracks = new List<PlaylistTrack>()
         };
 
@@ -71,9 +73,14 @@ public class PlaylistService : IPlaylistService
         return await _playlistRepo.AddAsync(playlist);
     }
 
-    public async Task UpdateAsync(PlaylistUpdateDto dto)
+    public async Task UpdateAsync(long userId,PlaylistUpdateDto dto)
     {
         var playlist = await _playlistRepo.GetByIdAsync(dto.Id);
+
+        if(playlist.UserId != userId)
+        {
+            throw new NotAllowedException($"You are not creator if this playList");
+        }
 
         playlist.Name = dto.Name;
 
@@ -94,8 +101,8 @@ public class PlaylistService : IPlaylistService
         await _playlistRepo.UpdateAsync(playlist);
     }
 
-    public async Task DeleteAsync(long id)
+    public async Task DeleteAsync(long id,long userId)
     {
-        await _playlistRepo.DeleteAsync(id);
+        await _playlistRepo.DeleteAsync(id,userId);
     }
 }

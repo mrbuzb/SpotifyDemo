@@ -8,5 +8,5 @@ public interface IPlaylistRepository
     Task<ICollection<Playlist>> GetByUserIdAsync(long userId);
     Task<long> AddAsync(Playlist playlist);
     Task UpdateAsync(Playlist playlist);
-    Task DeleteAsync(long id);
+    Task DeleteAsync(long id,long userId);
 }

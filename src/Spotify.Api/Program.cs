@@ -1,6 +1,7 @@
 using Spotify.Api.Configurations;
 using Spotify.Api.Endpoints;
 using Spotify.Api.Extensions;
+using Spotify.Api.Middlewares;
 
 namespace Spotify.Api
 {
@@ -56,9 +57,15 @@ namespace Spotify.Api
 
             app.UseAuthentication();
             app.UseAuthorization();
-            //app.UseMiddleware<ExceptionHandlingMiddleware>();
+            app.UseMiddleware<ExceptionHandlingMiddleware>();
             app.MapAuthEndpoints();
             app.MapAdminEndpoints();
+            app.MapPlaylistEndpoints();
+            app.MapPlaylistTrackEndpoints();
+            app.MapRecommendationEndpoints();
+            app.MapUserLikedTrackEndpoints();
+            app.MapUserTrackHistoryEndpoints();
+            app.MapTrackEndpoints();
 
             app.MapControllers();
 

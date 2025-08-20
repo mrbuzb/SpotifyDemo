@@ -12,7 +12,7 @@ using Spotify.Infrastructure.Persistence;
 namespace Spotify.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250820064501_InitialCreation")]
+    [Migration("20250820124046_InitialCreation")]
     partial class InitialCreation
     {
         /// <inheritdoc />

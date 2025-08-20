@@ -12,7 +12,8 @@ public class PlaylistRepository : IPlaylistRepository
 
     public async Task<Playlist> GetByIdAsync(long id)
     {
-        var playList = await _context.Playlists.Include(p => p.Tracks).FirstOrDefaultAsync(p => p.Id == id);
+        var playList = await _context.Playlists.Include(p => p.Tracks)
+        .ThenInclude(pt => pt.Track).FirstOrDefaultAsync(p => p.Id == id);
         if(playList is  null)
         {
             throw new EntityNotFoundException($"PlayList not found with idm {id}");
@@ -21,7 +22,11 @@ public class PlaylistRepository : IPlaylistRepository
     }
 
     public async Task<ICollection<Playlist>> GetByUserIdAsync(long userId)
-        => await _context.Playlists.Where(p => p.UserId == userId).ToListAsync();
+        => await _context.Playlists
+    .Where(p => p.UserId == userId)
+    .Include(p => p.Tracks)                  
+        .ThenInclude(pt => pt.Track)         
+    .ToListAsync();
 
     public async Task<long> AddAsync(Playlist playlist)
     {
@@ -36,10 +41,10 @@ public class PlaylistRepository : IPlaylistRepository
         await _context.SaveChangesAsync();
     }
 
-    public async Task DeleteAsync(long id)
+    public async Task DeleteAsync(long id, long userId)
     {
         var entity = await _context.Playlists.FindAsync(id);
-        if (entity != null)
+        if (entity != null && entity.UserId != userId)
         {
             _context.Playlists.Remove(entity);
             await _context.SaveChangesAsync();
