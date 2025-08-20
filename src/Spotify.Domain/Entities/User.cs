@@ -17,6 +17,7 @@ public class User
 
 
     public ICollection<Track> Tracks { get; set; }
+    public ICollection<UserLikedTrack> LikedTracks { get; set; }
     public ICollection<Playlist> Playlists { get; set; }
     public ICollection<RefreshToken> RefreshTokens { get; set; }
 }

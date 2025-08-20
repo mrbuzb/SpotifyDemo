@@ -13,4 +13,6 @@ public class Track
 
     public long UploadedById { get; set; }
     public User UploadedBy { get; set; }
+
+    public ICollection<UserLikedTrack> LikedByUsers {  get; set; }
 }
