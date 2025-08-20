@@ -12,17 +12,19 @@ public class UserLikedTrackConfiguration : IEntityTypeConfiguration<UserLikedTra
 
         builder.HasKey(ult => new { ult.UserId, ult.TrackId });
 
+        builder.Property(ult => ult.LikedAt)
+               .HasDefaultValueSql("GETUTCDATE()");
+
         builder.HasOne(ult => ult.User)
                .WithMany(u => u.LikedTracks)
                .HasForeignKey(ult => ult.UserId)
-               .OnDelete(DeleteBehavior.Cascade);
+               .OnDelete(DeleteBehavior.Restrict);
 
         builder.HasOne(ult => ult.Track)
                .WithMany(t => t.LikedByUsers)
                .HasForeignKey(ult => ult.TrackId)
-               .OnDelete(DeleteBehavior.Cascade);
+               .OnDelete(DeleteBehavior.Restrict);
 
-        // Default qiymat
         builder.Property(ult => ult.LikedAt)
                .HasDefaultValueSql("GETUTCDATE()");
     }

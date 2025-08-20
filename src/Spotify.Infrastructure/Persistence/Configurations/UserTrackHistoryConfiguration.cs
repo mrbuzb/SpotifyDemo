@@ -11,14 +11,16 @@ public class UserTrackHistoryConfiguration : IEntityTypeConfiguration<UserTrackH
         builder.HasKey(h => h.Id);
 
         builder.HasOne(h => h.User)
-            .WithMany()
-            .HasForeignKey(h => h.UserId);
+               .WithMany(u => u.TrackHistories)
+               .HasForeignKey(h => h.UserId)
+               .OnDelete(DeleteBehavior.Restrict);
 
         builder.HasOne(h => h.Track)
-            .WithMany()
-            .HasForeignKey(h => h.TrackId);
+               .WithMany(t => t.PlayHistories)
+               .HasForeignKey(h => h.TrackId)
+               .OnDelete(DeleteBehavior.Restrict);
 
         builder.Property(h => h.PlayCount)
-            .HasDefaultValue(1);
+               .HasDefaultValue(1);
     }
 }

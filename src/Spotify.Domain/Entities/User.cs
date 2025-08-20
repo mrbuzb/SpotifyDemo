@@ -15,7 +15,7 @@ public class User
     public long? ConfirmerId { get; set; }
     public UserConfirme? Confirmer { get; set; }
 
-
+    public ICollection<UserTrackHistory> TrackHistories { get; set; }
     public ICollection<Track> Tracks { get; set; }
     public ICollection<UserLikedTrack> LikedTracks { get; set; }
     public ICollection<Playlist> Playlists { get; set; }

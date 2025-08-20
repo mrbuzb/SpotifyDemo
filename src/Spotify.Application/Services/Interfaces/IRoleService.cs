@@ -1,5 +1,4 @@
-﻿using Pinterest.Application.Dto_s;
-using Spotify.Application.Dtos;
+﻿using Spotify.Application.Dtos;
 
 namespace Spotify.Application.Services.Interfaces;
 

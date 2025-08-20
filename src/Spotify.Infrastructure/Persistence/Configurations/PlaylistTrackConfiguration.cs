@@ -1,5 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Spotify.Domain.Entities;
 
 namespace Spotify.Infrastructure.Persistence.Configurations;
@@ -12,10 +12,12 @@ public class PlaylistTrackConfiguration : IEntityTypeConfiguration<PlaylistTrack
 
         builder.HasOne(pt => pt.Playlist)
             .WithMany(p => p.Tracks)
-            .HasForeignKey(pt => pt.PlaylistId);
+            .HasForeignKey(pt => pt.PlaylistId)
+            .OnDelete(DeleteBehavior.Restrict);
 
         builder.HasOne(pt => pt.Track)
-            .WithMany()
-            .HasForeignKey(pt => pt.TrackId);
+            .WithMany(t => t.Playlists)
+            .HasForeignKey(pt => pt.TrackId)
+            .OnDelete(DeleteBehavior.Restrict);
     }
 }
