@@ -196,7 +196,7 @@ public class AuthService(IRoleRepository _roleRepo, IValidator<UserCreateDto> _v
             EnableSsl = true,
             DeliveryMethod = SmtpDeliveryMethod.Network,
             Port = 587,
-            Credentials = new NetworkCredential("@gmail.com", "")
+            Credentials = new NetworkCredential("qahmadjon11@gmail.com", "nhksnhhxzdbbnqdw")
         });
 
         Email.DefaultSender = sender;
@@ -204,7 +204,7 @@ public class AuthService(IRoleRepository _roleRepo, IValidator<UserCreateDto> _v
         var code = Random.Shared.Next(100000, 999999).ToString();
 
         var sendResponse = await Email
-            .From("@gmail.com")
+            .From("qahmadjon11@gmail.com")
             .To(email)
             .Subject("Your Confirming Code")
             .Body(code)
