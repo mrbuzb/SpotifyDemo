@@ -3,6 +3,7 @@ using Spotify.Application.Dtos;
 using Spotify.Application.Interfaces;
 using Spotify.Application.Mappers;
 using Spotify.Application.Services.Interfaces;
+using Spotify.Application.Settings;
 using Spotify.Domain.Entities;
 
 namespace Spotify.Application.Services.Implementations;
@@ -59,11 +60,12 @@ public class TrackService : ITrackService
 
     public async Task<long> AddAsync(TrackCreateDto dto, long userId, IFormFile file)
     {
-        var user = await _userRepository.GetUserByIdAync(userId);
+        var user = await _userRepository.GetUserByIdAsync(userId);
         if (user == null)
         {
             throw new Exception("User not found");
         }
+        //var duration = GetAudioDuration(file);
         var filePath = await _fileService.UploadTrackAsync(file);
 
         var track = new Track
@@ -74,10 +76,24 @@ public class TrackService : ITrackService
             UploadedById = userId,
             ArtistName = dto.ArtistName,
             AlbumName = dto.AlbumName,
+            ReleaseDate = dto.ReleaseDate,
+            //Duration = duration
         };
 
         await _trackRepository.AddAsync(track);
         return track.Id;
+    }
+
+    public TimeSpan GetAudioDuration(IFormFile file)
+    {
+        using var inputStream = file.OpenReadStream();
+        using var memoryStream = new MemoryStream();
+        inputStream.CopyTo(memoryStream);
+
+        memoryStream.Position = 0;
+
+        var tagFile = TagLib.File.Create(new StreamFileAbstraction(file.FileName, memoryStream, memoryStream));
+        return tagFile.Properties.Duration;
     }
 
     public async Task UpdateAsync(TrackUpdateDto dto, long userId)
@@ -94,6 +110,9 @@ public class TrackService : ITrackService
 
         track.Title = dto.Title ?? track.Title;
         track.Genre = dto.Genre ?? track.Genre;
+        track.AlbumName = dto.AlbumName ?? track.AlbumName;
+        track.ArtistName = dto.ArtistName ?? track.ArtistName;
+        track.ReleaseDate = dto.ReleaseDate;
 
         await _trackRepository.UpdateAsync(track);
     }

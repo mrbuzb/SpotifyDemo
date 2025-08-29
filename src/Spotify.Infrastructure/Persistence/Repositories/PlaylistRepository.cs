@@ -13,7 +13,7 @@ public class PlaylistRepository : IPlaylistRepository
     public async Task<Playlist> GetByIdAsync(long id)
     {
         var playList = await _context.Playlists.Include(p => p.Tracks)
-        .ThenInclude(pt => pt.Track).FirstOrDefaultAsync(p => p.Id == id);
+        .ThenInclude(pt => pt.Track).ThenInclude(x => x.UploadedBy).FirstOrDefaultAsync(p => p.Id == id);
         if(playList is  null)
         {
             throw new EntityNotFoundException($"PlayList not found with idm {id}");
@@ -25,7 +25,7 @@ public class PlaylistRepository : IPlaylistRepository
         => await _context.Playlists
     .Where(p => p.UserId == userId)
     .Include(p => p.Tracks)                  
-        .ThenInclude(pt => pt.Track)         
+        .ThenInclude(pt => pt.Track).ThenInclude(x=>x.UploadedBy)         
     .ToListAsync();
 
     public async Task<long> AddAsync(Playlist playlist)

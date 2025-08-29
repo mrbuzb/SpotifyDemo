@@ -29,7 +29,7 @@ public class AuthService(IRoleRepository _roleRepo, IValidator<UserCreateDto> _v
             throw new AuthException(errorMessages);
         }
 
-        var isEmailExists = await _userRepo.GetUserByEmail(userCreateDto.Email);
+        var isEmailExists = await _userRepo.GetUserByEmailAsync(userCreateDto.Email);
 
         if (isEmailExists == null)
         {
@@ -52,13 +52,13 @@ public class AuthService(IRoleRepository _roleRepo, IValidator<UserCreateDto> _v
                 RoleId = await _roleRepo.GetRoleIdAsync("User")
             };
 
-            long userId = await _userRepo.AddUserAync(user);
+            long userId = await _userRepo.AddUserAsync(user);
 
-            var foundUser = await _userRepo.GetUserByIdAync(userId);
+            var foundUser = await _userRepo.GetUserByIdAsync(userId);
 
             foundUser.Confirmer!.UserId = userId;
 
-            await _userRepo.UpdateUser(foundUser);
+            await _userRepo.UpdateUserAsync(foundUser);
 
             return userId;
         }
@@ -72,7 +72,7 @@ public class AuthService(IRoleRepository _roleRepo, IValidator<UserCreateDto> _v
             isEmailExists.Salt = tupleFromHasher.Salt;
             isEmailExists.RoleId = await _roleRepo.GetRoleIdAsync("User");
 
-            await _userRepo.UpdateUser(isEmailExists);
+            await _userRepo.UpdateUserAsync(isEmailExists);
             return isEmailExists.UserId;
         }
 
@@ -89,7 +89,7 @@ public class AuthService(IRoleRepository _roleRepo, IValidator<UserCreateDto> _v
             throw new AuthException(errorMessages);
         }
 
-        var user = await _userRepo.GetUserByUserNameAync(userLoginDto.UserName);
+        var user = await _userRepo.GetUserByUserNameAsync(userLoginDto.UserName);
 
         var checkUserPassword = PasswordHasher.Verify(userLoginDto.Password, user.Password, user.Salt);
 
@@ -127,6 +127,7 @@ public class AuthService(IRoleRepository _roleRepo, IValidator<UserCreateDto> _v
         {
             AccessToken = token,
             RefreshToken = refreshToken,
+            User = new UserGetDto { Email = user.Confirmer.Email, ProfileImgUrl = user.ProfileImgUrl , Role = user.Role.Name, UserId = user.UserId , UserName = user.UserName},
             TokenType = "Bearer",
             Expires = 24
         };
@@ -152,7 +153,7 @@ public class AuthService(IRoleRepository _roleRepo, IValidator<UserCreateDto> _v
 
         refreshToken.IsRevoked = true;
 
-        var user = await _userRepo.GetUserByIdAync(userId);
+        var user = await _userRepo.GetUserByIdAsync(userId);
 
         var userGetDto = new UserGetDto()
         {
@@ -188,14 +189,14 @@ public class AuthService(IRoleRepository _roleRepo, IValidator<UserCreateDto> _v
 
     public async Task EailCodeSender(string email)
     {
-        var user = await _userRepo.GetUserByEmail(email);
+        var user = await _userRepo.GetUserByEmailAsync(email);
 
         var sender = new SmtpSender(() => new SmtpClient("smtp.gmail.com")
         {
             EnableSsl = true,
             DeliveryMethod = SmtpDeliveryMethod.Network,
             Port = 587,
-            Credentials = new NetworkCredential("qahmadjon11@gmail.com", "nhksnhhxzdbbnqdw")
+            Credentials = new NetworkCredential("@gmail.com", "")
         });
 
         Email.DefaultSender = sender;
@@ -203,7 +204,7 @@ public class AuthService(IRoleRepository _roleRepo, IValidator<UserCreateDto> _v
         var code = Random.Shared.Next(100000, 999999).ToString();
 
         var sendResponse = await Email
-            .From("qahmadjon11@gmail.com")
+            .From("@gmail.com")
             .To(email)
             .Subject("Your Confirming Code")
             .Body(code)
@@ -211,19 +212,19 @@ public class AuthService(IRoleRepository _roleRepo, IValidator<UserCreateDto> _v
 
         user.Confirmer!.ConfirmingCode = code;
         user.Confirmer.ExpiredDate = DateTime.UtcNow.AddHours(5).AddMinutes(10);
-        await _userRepo.UpdateUser(user);
+        await _userRepo.UpdateUserAsync(user);
     }
 
     public async Task<bool> ConfirmCode(string userCode, string email)
     {
-        var user = await _userRepo.GetUserByEmail(email);
+        var user = await _userRepo.GetUserByEmailAsync(email);
         var code = user.Confirmer!.ConfirmingCode;
         if (code == null || code != userCode || user.Confirmer.ExpiredDate < DateTime.Now || user.Confirmer.IsConfirmed is true)
         {
             throw new NotAllowedException("Code is incorrect");
         }
         user.Confirmer.IsConfirmed = true;
-        await _userRepo.UpdateUser(user);
+        await _userRepo.UpdateUserAsync(user);
         return true;
     }
 }

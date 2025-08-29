@@ -40,6 +40,7 @@ public class RoleService(IRoleRepository _roleRepo) : IRoleService
             UserId = user.UserId,
             UserName = user.UserName,
             Role = user.Role.Name,
+            ProfileImgUrl = user.ProfileImgUrl,
         };
     }
 }

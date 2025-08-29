@@ -25,7 +25,10 @@ public class RecommendationService : IRecommendationService
         var history = await _trackHistoryRepo.GetHistoryByUserAsync(userId);
 
         if (!history.Any())
-            return new List<Track>();
+        {
+            var musics =  await _trackRepo.GetAllAsync();
+            return musics.ToList();
+        }
 
         var genreScores = new Dictionary<string, double>();
 
@@ -35,7 +38,6 @@ public class RecommendationService : IRecommendationService
                 continue;
 
             double score = 1;
-
             score += h.PlayCount * 0.5;
 
             if (h.IsLiked)
@@ -55,9 +57,33 @@ public class RecommendationService : IRecommendationService
 
         var recommended = await _trackRepo.GetTracksByGenresAsync(topGenres);
 
-        var listenedIds = history.Select(h => h.TrackId).ToHashSet();
-        var final = recommended.Where(t => !listenedIds.Contains(t.Id)).ToList();
+        var trackScores = new Dictionary<Track, double>();
 
-        return final;
+        foreach (var track in recommended)
+        {
+            double score = 0;
+
+            var hist = history.FirstOrDefault(h => h.TrackId == track.Id);
+            if (hist != null)
+            {
+                score += 1 + hist.PlayCount * 0.5;
+                if (hist.IsLiked) score += 5;
+            }
+
+            if (track.Genre != null && genreScores.ContainsKey(track.Genre))
+            {
+                score += genreScores[track.Genre];
+            }
+
+            trackScores[track] = score;
+        }
+
+        var finalList = trackScores
+            .OrderByDescending(x => x.Value)
+            .Select(x => x.Key)
+            .ToList();
+
+        return finalList;
     }
+
 }

@@ -20,7 +20,7 @@ public static class PlaylistEndpoints
             return Results.Ok(result);
         });
 
-        group.MapPut("/{id:long}", async (HttpContext context, IPlaylistService service,PlaylistUpdateDto dto) =>
+        group.MapPut("/update", async (HttpContext context, IPlaylistService service,PlaylistUpdateDto dto) =>
         {
             var userId = context.User.FindFirst("UserId")?.Value;
             if (userId == null) throw new UnauthorizedAccessException();

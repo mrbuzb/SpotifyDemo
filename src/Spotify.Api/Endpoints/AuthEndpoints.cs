@@ -1,4 +1,5 @@
-﻿using Spotify.Application.Dtos;
+﻿using Microsoft.AspNetCore.Mvc;
+using Spotify.Application.Dtos;
 using Spotify.Application.Services.Interfaces;
 
 namespace Spotify.Api.Endpoints;
@@ -48,7 +49,7 @@ public static class AuthEndpoints
         async (UserLoginDto user, IAuthService _service) =>
         {
             var result = await _service.LoginUserAsync(user);
-            return Results.Ok(new { success = true, data = result });
+            return Results.Ok(result);
         })
          .WithName("Login");
 
@@ -68,6 +69,19 @@ public static class AuthEndpoints
             return Results.Ok();
         })
         .WithName("LogOut");
+
+        userGroup.MapPost("/upload-profile-img",
+        async (IFormFile file,IUserService _userService,HttpContext context) =>
+        {
+            var userId = context.User.FindFirst("UserId")?.Value;
+            if (userId == null) throw new UnauthorizedAccessException();
+
+            await _userService.UploadProfileImgAsync(file,long.Parse(userId));
+            return Results.Ok();
+        })
+        .WithName("UploadImg")
+        .DisableAntiforgery()
+        .WithTags("ProfileManagement");
 
     }
 }

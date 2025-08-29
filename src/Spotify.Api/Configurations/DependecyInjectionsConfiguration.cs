@@ -15,6 +15,7 @@ public static class DependecyInjectionsConfiguration
     public static void ConfigureDependecies(this IServiceCollection services)
     {
         services.AddScoped<IAuthService, AuthService>();
+        services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<ICloudService, CloudinaryService>();
         services.AddScoped<IPlaylistService, PlaylistService>();
         services.AddScoped<IPlaylistTrackService, PlaylistTrackService>();

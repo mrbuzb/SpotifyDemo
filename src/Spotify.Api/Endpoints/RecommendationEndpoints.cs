@@ -9,7 +9,7 @@ public static class RecommendationEndpoints
     {
         var group = app.MapGroup("api/recommendations")
             .RequireAuthorization()
-            .WithTags("Recommendations");
+            .WithTags("RecommendationManagement");
 
         group.MapGet("", async (HttpContext context, IRecommendationService service) =>
         {

@@ -22,7 +22,7 @@ public static class TrackEndpoints
             return Results.Ok(tracks);
         });
 
-        group.MapGet("/by-user/{userId:long}", async ([FromServices] ITrackService service, HttpContext context) =>
+        group.MapGet("/by-user", async ([FromServices] ITrackService service, HttpContext context) =>
         {
             var userIdStr = context.User.FindFirst("UserId")?.Value;
             if (userIdStr == null)
@@ -53,7 +53,7 @@ public static class TrackEndpoints
         })
           .DisableAntiforgery();
 
-        group.MapPut("/{userId:long}", async ([FromServices] ITrackService service, [FromBody] TrackUpdateDto dto, HttpContext context) =>
+        group.MapPut("/update", async ([FromServices] ITrackService service, [FromBody] TrackUpdateDto dto, HttpContext context) =>
         {
             var userIdStr = context.User.FindFirst("UserId")?.Value;
             if (userIdStr == null)
@@ -62,7 +62,7 @@ public static class TrackEndpoints
             return Results.NoContent();
         });
 
-        group.MapDelete("/{id:long}/user/{userId:long}", async ([FromServices] ITrackService service, long id, HttpContext context) =>
+        group.MapDelete("/{id:long}", async ([FromServices] ITrackService service, long id, HttpContext context) =>
         {
             var userIdStr = context.User.FindFirst("UserId")?.Value;
             if (userIdStr == null)

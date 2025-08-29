@@ -1,10 +1,11 @@
-﻿using Spotify.Application.Interfaces;
+﻿using Microsoft.AspNetCore.Http;
+using Spotify.Application.Interfaces;
 using Spotify.Application.Services.Interfaces;
 using Spotify.Core.Errors;
 
 namespace Spotify.Application.Services.Implementations;
 
-public class UserService(IUserRepository _userRepository) : IUserService
+public class UserService(IUserRepository _userRepository, ICloudService _cloudService) : IUserService
 {
     public async Task DeleteUserByIdAsync(long userId, string userRole)
     {
@@ -14,7 +15,7 @@ public class UserService(IUserRepository _userRepository) : IUserService
         }
         else if (userRole == "Admin")
         {
-            var user = await _userRepository.GetUserByIdAync(userId);
+            var user = await _userRepository.GetUserByIdAsync(userId);
             if (user.Role.Name == "User")
             {
                 await _userRepository.DeleteUserByIdAsync(userId);
@@ -26,5 +27,16 @@ public class UserService(IUserRepository _userRepository) : IUserService
         }
     }
 
-    public async Task UpdateUserRoleAsync(long userId, string userRole) => await _userRepository.UpdateUserRoleAsync(userId, userRole);
+    public async Task UploadProfileImgAsync(IFormFile file, long userId)
+    {
+        var user = await _userRepository.GetUserByIdAsync(userId);
+
+        user.ProfileImgUrl = await _cloudService.UploadProfileImageAsync(file);
+        await _userRepository.UpdateUserAsync(user);
+    }
+
+    public async Task UpdateUserRoleAsync(long userId, string userRole)
+    {
+        await _userRepository.UpdateUserRoleAsync(userId, userRole);
+    }
 }
